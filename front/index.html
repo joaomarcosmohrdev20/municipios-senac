@@ -1,20 +1,33 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-    <meta charset="UTF-8">    
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Municipios</title>
+    <title>Municípios</title>
+    <link rel="stylesheet" href="style.css">
     <script src="index.js" defer></script>
 </head>
+
 <body>
-    <h3>Novo Município</h3>
-    <input type="text" id="campoMunicipio" placeholder="Nome do Município">
-    <input type="text" id="campoUF" placeholder="UF do Município">
-    <input type="text" id="campoCaracteristica" placeholder="Caracteristica do Município">
-    <button id="btnSalvar">Inserir</button>
-    <p></p>
-    <p></p>
-    <button id ="btn">Carrregar Municipios</button>
-    <ul id="listagem">carregando...</ul>
+
+    <h1>Municípios (API)</h1>
+
+    <button id="btn">Carregar municípios</button>
+
+    <h2>Novo Município</h2>
+
+    <div class="form">
+        <input type="text" id="campoMunicipio" placeholder="Nome do município">
+        <input type="text" id="campoUF" placeholder="UF (ex: RS)">
+        <input type="text" id="campoCaracteristica" placeholder="Característica">
+        <button id="btnSalvar">Salvar</button>
+    </div>
+
+    <h2>Lista de Municípios</h2>
+    <div id="listagem" class="container"></div>
+
+    
 </body>
+
 </html>

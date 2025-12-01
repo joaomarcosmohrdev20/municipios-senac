@@ -1,51 +1,71 @@
 const API = "http://127.0.0.1:3000/municipios";
+
 const listagem = document.getElementById("listagem");
-console.log('hhhhhhh')
-
 const btnCarregar = document.getElementById("btn");
-btnCarregar.addEventListener("click", carregarMunicipios)
-
 const btnSalvar = document.getElementById("btnSalvar");
-btnSalvar.addEventListener("click", inserirMunicipio)
 
+// Eventos
+btnCarregar.addEventListener("click", carregarMunicipios);
+btnSalvar.addEventListener("click", inserirMunicipio);
+
+//--------------------------------------------------
+// LISTAR MUNICÍPIOS
+//--------------------------------------------------
 async function carregarMunicipios() {
-    console.log("teste");
     try {
-        //fetch
         const resposta = await fetch(API);
         const dados = await resposta.json();
-        listagem.innerHTML = "";
-        dados.forEach(municipio => {
-            const linha = document.createElement("li");
-            linha.textContent = municipio.nome + " " + municipio.caracteristica;
-            listagem.appendChild(linha)
-        });
 
-    }
-    catch (erro) {
-        console.log("errorrrrrrrrrrrrr", erro.message)
+        listagem.innerHTML = ""; // limpa
+
+        dados.forEach(m => criarCard(m));
+
+    } catch (erro) {
+        console.error("Erro ao carregar:", erro.message);
     }
 }
 
-async function inserirMunicipio() {
+//--------------------------------------------------
+// CRIAR CARD NO FRONT
+//--------------------------------------------------
+function criarCard(m) {
+    const card = document.createElement("div");
+    card.classList.add("card");
 
-    const  campoMunicipio = document.getElementById("campoMunicipio").value;
-    const  campoUF = document.getElementById("campoUF").value;
-    const  campoCaracteristica = document.getElementById("campoCaracteristica").value;
-    const novoMunicipio = {
-        nome: campoMunicipio,
-        estado: campoUF,
-        caracteristica: campoCaracteristica
-    };
+    card.innerHTML = `
+        <h3>${m.nome} (${m.estado})</h3>
+        <p>${m.caracteristica}</p>
+        <button class="btn-delete" onclick="deletarMunicipio(${m.id})">Deletar</button>
+    `;
+
+    listagem.appendChild(card);
+}
+
+//--------------------------------------------------
+// INSERIR MUNICÍPIO (POST)
+//--------------------------------------------------
+async function inserirMunicipio() {
+    const nome = document.getElementById("campoMunicipio").value;
+    const estado = document.getElementById("campoUF").value;
+    const caracteristica = document.getElementById("campoCaracteristica").value;
+
+    const novoMunicipio = { nome, estado, caracteristica };
 
     try {
         const resposta = await fetch(API, {
             method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(novoMunicipio),
-            headers: { "Content-Type": "application/json" }
-        })
+        });
+
+        if (!resposta.ok) {
+            throw new Error("Erro ao inserir!");
+        }
+
+        carregarMunicipios();
 
     } catch (erro) {
-        console.error("deu ruim ", erro.message)
+        console.error("Erro ao inserir:", erro.message);
     }
 }
+
