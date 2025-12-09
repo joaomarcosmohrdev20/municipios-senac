@@ -1,14 +1,22 @@
 const API = "http://127.0.0.1:3000/municipios";
 
+const limit = 3;
+let offset = 0;
+let lastScrollTop = 0
 const listagem = document.getElementById("listagem");
+const lista = document.getElementById("lista");
 const btnCarregar = document.getElementById("btn");
 const btnSalvar = document.getElementById("btnSalvar");
+const btnMais = document.getElementById("btnmais");
+const btnMenos = document.getElementById("btnmenos");
 
 const campoMunicipio = document.getElementById("campoMunicipio")
 const campoUF = document.getElementById("campoUF")
 const campoCaracteristica = document.getElementById("campoCaracteristica")
 // Eventos
 btnCarregar.addEventListener("click", carregarMunicipios);
+btnMais.addEventListener("click", carregarMaisMunicipios);
+btnMenos.addEventListener("click", carregarMenosMunicipios);
 btnSalvar.addEventListener("click", inserirMunicipio);
 
 //--------------------------------------------------
@@ -16,14 +24,14 @@ btnSalvar.addEventListener("click", inserirMunicipio);
 //--------------------------------------------------
 async function carregarMunicipios() {
     try {
-        const resposta = await fetch(API);
+        offset = 0;
+        const resposta = await fetch(API+"?limit="+limit+"&offset="+offset);
         const dados = await resposta.json();
 
         listagem.innerHTML = ""; // limpa
 
         dados.forEach(m => criarCard(m));
         
-
     } catch (erro) {
         console.error("Erro ao carregar:", erro.message);
     }
@@ -38,6 +46,7 @@ function criarCard(m) {
         card.classList.add("card");
 
         card.innerHTML = `
+            <h2>${m.id}</h2>
             <h3>${m.nome} (${m.estado})</h3>
             <p>${m.caracteristica}</p>
             <button class="btn-delete" onclick="deletar(${m.id})">Deletar</button>
@@ -45,8 +54,6 @@ function criarCard(m) {
         `;
 
         listagem.appendChild(card);
-        alterarMunicipio();
-        carregarMunicipios();
 }
 
 //--------------------------------------------------
@@ -102,5 +109,51 @@ async function alterarMunicipio(id) {
     document.getElementById("campoMunicipio").value = id;
     document.getElementById("campoUF").value = id;
     document.getElementById("campo").value = id;
-
 }
+
+async function carregarMaisMunicipios() {
+    try {
+        offset = offset + 3;
+        console.log(offset)
+        const resposta = await fetch(API+"?limit="+limit+"&offset="+offset);
+        const dados = await resposta.json();
+
+        listagem.innerHTML = ""; // limpa
+
+        dados.forEach(m => criarCard(m));
+        
+    } catch (erro) {
+        console.error("Erro ao carregar:", erro.message);
+    }
+}
+
+async function carregarMenosMunicipios() {
+    try {
+        offset = offset - 3;
+        console.log(offset)
+        const resposta = await fetch(API+"?limit="+limit+"&offset="+offset);
+        const dados = await resposta.json();
+
+        listagem.innerHTML = ""; // limpa
+
+        dados.forEach(m => criarCard(m));
+        
+    } catch (erro) {
+        console.error("Erro ao carregar:", erro.message);
+    }
+}
+
+window.addEventListener("scroll", async () => {
+    let scrollTop = window.pageYOffset;
+
+    console.log("scrolleeeiiiiii");
+
+    if (scrollTop > lastScrollTop) { console.log("rolou pra baixo") 
+
+    }else{
+        console.log("Rolei para cima!!!")
+    }
+
+    lastScrollTop = lastScrollTop
+    
+});
