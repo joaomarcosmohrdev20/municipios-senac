@@ -1,8 +1,12 @@
 const API = "http://127.0.0.1:3000/municipios";
+const CLIENT_API_KEY = "SUA_CHAVE_SECRETA_MUITO_FORTE_123456";
 
-const limit = 3;
-let offset = 0;
-let lastScrollTop = 0
+// Variáveis comuns
+let limit = 3;
+let offset = 1;
+let lastScrollTop = 0 // Armazena o valor da última scrollada
+
+// Variáveis de elementos
 const listagem = document.getElementById("listagem");
 const lista = document.getElementById("lista");
 const btnCarregar = document.getElementById("btn");
@@ -24,16 +28,15 @@ btnSalvar.addEventListener("click", inserirMunicipio);
 //--------------------------------------------------
 async function carregarMunicipios() {
     try {
-        offset = 0;
-        const resposta = await fetch(API+"?limit="+limit+"&offset="+offset);
-        const dados = await resposta.json();
+        const resposta = await fetch(API+"?limit="+limit+"&offset="+offset, { headers: { 'minha_chave': CLIENT_API_KEY } }); // variável "resposta" armazena os registros da API através do fetch usando também como parâmetros as variáveis "limit" e "offset" 
+        const dados = await resposta.json(); // "dados" recebe o conteúdo da variável "resposta" em formado .json
 
         listagem.innerHTML = ""; // limpa
 
-        dados.forEach(m => criarCard(m));
-        
+        dados.forEach(m => criarCard(m)); // é criado um laço de repetição a partir de "dados" que cria um card para cada registro da variável "dados"
+
     } catch (erro) {
-        console.error("Erro ao carregar:", erro.message);
+        console.log("Erro ao carregar:");
     }
 }
 
@@ -42,18 +45,18 @@ async function carregarMunicipios() {
 //--------------------------------------------------
 function criarCard(m) {
 
-        const card = document.createElement("div");
-        card.classList.add("card");
+    const card = document.createElement("div");
+    card.classList.add("card");
 
-        card.innerHTML = `
+    card.innerHTML = `
             <h2>${m.id}</h2>
             <h3>${m.nome} (${m.estado})</h3>
             <p>${m.caracteristica}</p>
             <button class="btn-delete" onclick="deletar(${m.id})">Deletar</button>
-            <button class="btn-alterar" onclick="alterarMunicipio(${m.id})>Alterar</button>
+            <button class="btn-alterar" onclick="alterarMunicipio(${m.id})">Alterar</button>
         `;
 
-        listagem.appendChild(card);
+    listagem.appendChild(card);
 }
 
 //--------------------------------------------------
@@ -88,10 +91,10 @@ async function inserirMunicipio() {
     }
 }
 
-async function deletar(idDeletar){
-    
-    try{
-        const urlDelete = API+"/"+idDeletar
+async function deletar(idDeletar) {
+
+    try {
+        const urlDelete = API + "/" + idDeletar
         const resposta = await fetch(urlDelete,
             {
                 method: "DELETE"
@@ -106,22 +109,42 @@ async function deletar(idDeletar){
 }
 
 async function alterarMunicipio(id) {
-    document.getElementById("campoMunicipio").value = id;
-    document.getElementById("campoUF").value = id;
-    document.getElementById("campo").value = id;
+    try {
+        createElement('<input id="nomeAlterar"></input>' & '<input id="ufAlterar"></input>' & '<input id="caracteristicaAlterar"></input>')
+
+        const resposta = await fetch(API, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(novoMunicipio),
+        });
+
+
+        if (!resposta.ok) {
+            throw new Error("Erro ao alterar!");
+        }
+
+        carregarMunicipios();
+
+        document.getElementById("campoMunicipio").value = "";
+        document.getElementById("campoUF").value = "";
+        document.getElementById("campo").value = "";
+
+    } catch (erro) {
+        console.error("Erro ao alterar:", erro.message);
+    }
 }
 
 async function carregarMaisMunicipios() {
     try {
-        offset = offset + 3;
+        offset = offset + 3; //offset diz quantas linhas serão puladas
         console.log(offset)
-        const resposta = await fetch(API+"?limit="+limit+"&offset="+offset);
-        const dados = await resposta.json();
+        const resposta = await fetch(API + "?limit=" + limit + "&offset=" + offset); //Variável resposta recebe as linhas da API, mas com parâmetros limit (para limitar a quantidade de registros que serão carregados) e offset(quantos registros serão pulados);
+        const dados = await resposta.json(); // Transforma a variável resposta para formato .json através da função json() e armazena na variável "dados"
 
         listagem.innerHTML = ""; // limpa
 
-        dados.forEach(m => criarCard(m));
-        
+        dados.forEach(m => criarCard(m)); // Cria um laço de repetição do tipo forEach a partir da variável "dados" que, para cada registro da variável "dados", cria um card
+
     } catch (erro) {
         console.error("Erro ao carregar:", erro.message);
     }
@@ -129,31 +152,16 @@ async function carregarMaisMunicipios() {
 
 async function carregarMenosMunicipios() {
     try {
-        offset = offset - 3;
+        offset = offset - 3; //offset diz quantas linhas serão puladas
         console.log(offset)
-        const resposta = await fetch(API+"?limit="+limit+"&offset="+offset);
-        const dados = await resposta.json();
+        const resposta = await fetch(API + "?limit=" + limit + "&offset=" + offset); //Variável resposta recebe as linhas da API, mas com parâmetros limit (para limitar a quantidade de registros que serão carregados) e offset(quantos registros serão pulados);
+        const dados = await resposta.json(); // Transforma a variável resposta para formato .json através da função json() e armazena na variável "dados"
 
         listagem.innerHTML = ""; // limpa
 
-        dados.forEach(m => criarCard(m));
-        
+        dados.forEach(m => criarCard(m)); // Cria um laço de repetição do tipo forEach a partir da variável "dados" que, para cada registro da variável "dados", cria um card
+
     } catch (erro) {
         console.error("Erro ao carregar:", erro.message);
     }
 }
-
-window.addEventListener("scroll", async () => {
-    let scrollTop = window.pageYOffset;
-
-    console.log("scrolleeeiiiiii");
-
-    if (scrollTop > lastScrollTop) { console.log("rolou pra baixo") 
-
-    }else{
-        console.log("Rolei para cima!!!")
-    }
-
-    lastScrollTop = lastScrollTop
-    
-});
